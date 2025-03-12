@@ -2,6 +2,9 @@ import click
 from pathlib import Path
 import yaml
 import os
+import subprocess
+from datetime import datetime
+from jinja2 import Template
 from .file_utils import find_all_notes, get_tags_from_meta_data, get_front_matter
 from .fzf_utils import fzf_select
 from .link_checker import fix_broken_links, update_backlinks, show_isolated_files
@@ -17,6 +20,17 @@ else:
 def get_notes_directory():
     return config.get('notes_directory', '.')
 
+def get_editor():
+    return config.get('editor', 'notepad')  # Default to notepad if no editor is specified
+
+def get_template(template_name):
+    templates_dir = config.get('templates_directory', './templates')
+    template_path = Path(templates_dir) / f"{template_name}.adoc"
+    if template_path.exists():
+        with template_path.open('r') as template_file:
+            return template_file.read()
+    return ""
+
 @click.group()
 @click.option("--directory", "-d", type=click.Path(exists=True, file_okay=False, readable=True), 
               default=get_notes_directory(), show_default=True, help="Root directory containing notes.")
@@ -24,6 +38,46 @@ def get_notes_directory():
 def cli(ctx, directory):
     """CLI for managing notes and tags."""
     ctx.obj = {"directory": Path(directory)}
+
+@cli.command()
+@click.pass_context
+@click.argument("title", required=False)
+@click.option("-i", "--interactive", is_flag=True, help="Use fzf for selection")
+@click.option("-t", "--template", default="note", help="Template to use for the new note")
+def note(ctx, title, interactive, template):
+    """Create or open a note with a timestamped filename."""
+    directory = ctx.obj["directory"]
+
+    if interactive:
+        # Find all files
+        files = [str(file) for file in directory.glob("*.adoc")]
+        selected = fzf_select(files)
+        if selected:
+            filepath = Path(selected)
+            click.echo(f"Selected file: {filepath}")
+        else:
+            click.echo("No file selected.")
+            return
+    else:
+        if not title:
+            click.echo("Title is required when not using interactive mode.")
+            return
+        timestamp = datetime.now().strftime("%Y%m%d%H%M")
+        filename = f"{timestamp}-{title.replace(' ', '-').lower()}.adoc"
+        filepath = directory / filename
+
+        if not filepath.exists():
+            template_content = get_template(template)
+            rendered_content = Template(template_content).render(title=title, now=datetime.now())
+            with filepath.open('w') as note_file:
+                note_file.write(rendered_content)
+
+    # Open the file in the specified editor
+    editor = get_editor()
+    try:
+        subprocess.run([editor, str(filepath)], check=True)
+    except FileNotFoundError:
+        click.echo(f"Error: The specified editor '{editor}' was not found. Please ensure it is installed and in your PATH.", err=True)
 
 @cli.command()
 @click.pass_context

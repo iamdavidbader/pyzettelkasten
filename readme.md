@@ -3,7 +3,7 @@
 `pyzettelkasten` is a CLI tool for managing Zettelkasten notes.
 
 I used this project to test the capabilities of GPTs.
-Most of the code is written using GPT-4o.
+Most of the code is written using GPT-4.
 
 ## Installation
 
@@ -48,6 +48,22 @@ You can configure the directory of your notes using a YAML configuration file lo
 
 ```yaml
 notes_directory: /path/to/your/notes
+editor: notepad
+templates_directory: /path/to/your/templates
+```
+
+## Templates
+
+You can create templates for your notes. Here is an example template for a note:
+
+```asciidoc
+// filepath: /path/to/your/templates/note.adoc
+---
+title : "{{ title }}"
+id: {{ now.strftime('%Y%m%d%H%M') }}
+date: {{ now.strftime('%Y-%m-%d') }}
+---
+= {{ title }}
 ```
 
 ## License
