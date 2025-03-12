@@ -18,14 +18,14 @@ else:
     config = {}
 
 def get_notes_directory():
-    return config.get('notes_directory', '.')
+    return Path(config.get('notes_directory', '.'))
 
 def get_editor():
     return config.get('editor', 'notepad')  # Default to notepad if no editor is specified
 
 def get_template(template_name):
-    templates_dir = config.get('templates_directory', './templates')
-    template_path = Path(templates_dir) / f"{template_name}.adoc"
+    templates_dir = Path(config.get('templates_directory', './templates'))
+    template_path = templates_dir / f"{template_name}.adoc"
     if template_path.exists():
         with template_path.open('r') as template_file:
             return template_file.read()
@@ -156,7 +156,7 @@ def isolated(ctx, interactive):
     files = show_isolated_files(directory)
 
     if interactive:
-        selected = fzf_select(files)
+        selected = fzf_select([str(file) for file in files])
         if selected:
             click.echo(f"Selected file: {selected}")
     else:
