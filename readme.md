@@ -2,6 +2,9 @@
 
 `pyzettelkasten` is a CLI tool for managing Zettelkasten notes.
 
+I used this project to test the capabilities of GPTs.
+Most of the code is written using GPT-4o.
+
 ## Installation
 
 You can install the package using `pip`:
