@@ -50,7 +50,13 @@ You can configure the directory of your notes using a YAML configuration file lo
 notes_directory: /path/to/your/notes
 editor: notepad
 templates_directory: /path/to/your/templates
+default_folder: notes
 ```
+
+- `notes_directory`: The root directory containing your notes.
+- `editor`: The editor to use for opening notes.
+- `templates_directory`: The directory containing templates for new notes.
+- `default_folder`: The default subfolder within `notes_directory` where new notes will be created.
 
 ## Templates
 

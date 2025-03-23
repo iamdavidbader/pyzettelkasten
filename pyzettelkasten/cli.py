@@ -31,6 +31,9 @@ def get_template(template_name):
             return template_file.read()
     return ""
 
+def get_default_folder():
+    return Path(config.get('default_folder', '.'))
+
 @click.group()
 @click.option("--directory", "-d", type=click.Path(exists=True, file_okay=False, readable=True), 
               default=get_notes_directory(), show_default=True, help="Root directory containing notes.")
@@ -46,7 +49,7 @@ def cli(ctx, directory):
 @click.option("-t", "--template", default="note", help="Template to use for the new note")
 def note(ctx, title, interactive, template):
     """Create or open a note with a timestamped filename."""
-    directory = ctx.obj["directory"]
+    directory = ctx.obj["directory"] / get_default_folder()
 
     if interactive:
         # Find all files
