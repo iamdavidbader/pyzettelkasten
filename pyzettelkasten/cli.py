@@ -7,7 +7,7 @@ from datetime import datetime
 from jinja2 import Template
 from .file_utils import find_all_notes, get_tags_from_meta_data, get_front_matter
 from .fzf_utils import fzf_select
-from .link_checker import fix_broken_links, update_backlinks, show_isolated_files
+from .link_checker import fix_broken_links, update_yaml_backlinks, show_isolated_files
 
 # Load configuration from YAML file
 config_path = Path(os.path.expanduser("~/.config/pyzettelkasten/config.yaml"))
@@ -151,7 +151,16 @@ def fix_links(ctx, dry_run, ask):
     """Find and fix broken xref links in AsciiDoc files."""
     directory = ctx.obj["directory"]
     fix_broken_links(directory, dry_run, ask)
-    update_backlinks(directory, dry_run)
+
+@cli.command()
+@click.pass_context
+@click.option("--dry-run", is_flag=True, help="Preview changes without modifying files")
+@click.option("--ask", is_flag=True, help="Ask before applying each fix")
+def update_backlinks(ctx, dry_run, ask):
+    """Update backlinks in AsciiDoc files."""
+    directory = ctx.obj["directory"]
+    click.echo("test")
+    update_yaml_backlinks(directory, dry_run, ask)
 
 @cli.command()
 @click.pass_context

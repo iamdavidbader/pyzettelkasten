@@ -63,7 +63,7 @@ def fix_broken_links(root_dir: Path, dry_run=False, ask=False):
     click.secho("\n✅ All broken links processed.", fg="green")
 
 
-def update_backlinks(root_dir: Path, dry_run=False, ask=False):
+def update_yaml_backlinks(root_dir: Path, dry_run=False, ask=False):
     """Update backlinks in AsciiDoc files if the front matter is valid."""
     # Loop through all .adoc files in the root directory
     notes = find_all_notes(root_dir)
@@ -86,11 +86,14 @@ def update_backlinks(root_dir: Path, dry_run=False, ask=False):
         for xref in xrefs:
             # Resolve the xref file path relative to the root
             xref_path = (file.parent / xref).resolve()
-            xref_relative = xref_path.relative_to(root_path)
 
-            # Only add the backlink if it's a valid file and not the current file
-            if xref_relative != file.resolve().relative_to(root_path):
-                backlinks_map[xref_relative].append(file.name)  # Only store the filename, not full path
+            # Ensure the xref points to a valid file
+            if xref_path.exists() and xref_path in notes.values():
+                xref_relative = xref_path.relative_to(root_path)
+    
+                # Only add the backlink if it's a valid file and not the current file
+                if xref_relative != file.resolve().relative_to(root_path):
+                    backlinks_map[xref_relative].append(file.name)  # Only store the filename, not full path
 
     # Now, update the backlinks in each file's front matter
     for unique_id, file in notes.items():
