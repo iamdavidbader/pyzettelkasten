@@ -51,26 +51,32 @@ def note(ctx, title, interactive, template):
     if interactive:
         # Find all files
         files = [str(file) for file in directory.glob("*.adoc")]
-        selected = fzf_select(files)
+        query, selected = fzf_select(files)
         if selected:
             filepath = Path(selected)
             click.echo(f"Selected file: {filepath}")
+        elif query:
+            click.echo(query)
+            # Use the query string to create a new note
+            title = query
         else:
-            click.echo("No file selected.")
+            click.echo("No file selected and no input provided.")
             return
     else:
         if not title:
             click.echo("Title is required when not using interactive mode.")
             return
+    if title:
+        # Create a new note if no file was selected
         timestamp = datetime.now().strftime("%Y%m%d%H%M")
         filename = f"{timestamp}-{title.replace(' ', '-').lower()}.adoc"
         filepath = directory / filename
 
-        if not filepath.exists():
-            template_content = get_template(template)
-            rendered_content = Template(template_content).render(title=title, now=datetime.now())
-            with filepath.open('w') as note_file:
-                note_file.write(rendered_content)
+    if not filepath.exists():
+        template_content = get_template(template)
+        rendered_content = Template(template_content).render(title=title, now=datetime.now())
+        with filepath.open('w') as note_file:
+            note_file.write(rendered_content)
 
     # Open the file in the specified editor
     editor = get_editor()
