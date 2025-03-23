@@ -1,3 +1,9 @@
+## v0.3.1 (2025-03-23)
+
+### Fix
+
+- interactive note creation searches recursevly from root
+
 ## v0.3.0 (2025-03-23)
 
 ### Feat
