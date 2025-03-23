@@ -49,11 +49,11 @@ def cli(ctx, directory):
 @click.option("-t", "--template", default="note", help="Template to use for the new note")
 def note(ctx, title, interactive, template):
     """Create or open a note with a timestamped filename."""
-    directory = ctx.obj["directory"] / get_default_folder()
+    directory = ctx.obj["directory"]
 
     if interactive:
         # Find all files
-        files = [str(file) for file in directory.glob("*.adoc")]
+        files = [str(file) for file in directory.rglob("*.adoc")]
         query, selected = fzf_select(files)
         if selected:
             filepath = Path(selected)
@@ -73,7 +73,7 @@ def note(ctx, title, interactive, template):
         # Create a new note if no file was selected
         timestamp = datetime.now().strftime("%Y%m%d%H%M")
         filename = f"{timestamp}-{title.replace(' ', '-').lower()}.adoc"
-        filepath = directory / filename
+        filepath = directory / get_default_folder() / filename
 
     if not filepath.exists():
         template_content = get_template(template)
