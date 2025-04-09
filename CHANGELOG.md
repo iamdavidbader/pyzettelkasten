@@ -1,3 +1,13 @@
+## v0.4.0 (2025-04-09)
+
+### Feat
+
+- display relative path in fzf preview
+
+### Fix
+
+- relative path computation in fix_broken_links
+
 ## v0.3.1 (2025-03-23)
 
 ### Fix
