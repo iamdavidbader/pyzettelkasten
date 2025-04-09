@@ -53,10 +53,12 @@ def note(ctx, title, interactive, template):
 
     if interactive:
         # Find all files
-        files = [str(file) for file in directory.rglob("*.adoc")]
-        query, selected = fzf_select(files)
+        files_map = find_all_notes(directory)
+        # Use fzf to select a file
+        files = [str(file.relative_to(directory)) for file in files_map.values()]
+        query, selected = fzf_select(files, directory)
         if selected:
-            filepath = Path(selected)
+            filepath = directory / Path(selected)
             click.echo(f"Selected file: {filepath}")
         elif query:
             click.echo(query)
@@ -115,13 +117,13 @@ def tag(ctx, tag, interactive):
     """List files with a specific tag."""
     directory = ctx.obj["directory"]
     files = [
-        str(file)
+        str(file.relative_to(directory))
         for file in find_all_notes(directory).values()
         if tag in get_tags_from_meta_data(get_front_matter(file))
     ]
 
     if interactive:
-        selected = fzf_select(files)
+        selected = fzf_select(files, directory)
         if selected:
             click.echo(f"Selected file: {selected}")
     else:

@@ -1,7 +1,7 @@
 import subprocess
 import click
 
-def fzf_select(items):
+def fzf_select(items, directory = "."):
     """Pipes a list of items to fzf and captures both the query and the selected item."""
     if not items:
         click.echo("No results found.")
@@ -19,7 +19,8 @@ def fzf_select(items):
             ],
             input="\n".join(items),
             text=True,
-            capture_output=True
+            capture_output=True,
+            cwd=directory
         )
 
         # Split the output into lines
