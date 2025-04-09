@@ -39,7 +39,7 @@ def fix_broken_links(root_dir: Path, dry_run=False, ask=False):
 
     for file, broken_xref, correct_path in broken_links:
         if correct_path:
-            correct_xref = correct_path.relative_to(file.parent).as_posix()
+            correct_xref = correct_path.relative_to(root_dir).as_posix()
             click.secho(f"\n🔧 Fixing {broken_xref} → {correct_xref} in {file}", fg="yellow")
 
             if dry_run:
